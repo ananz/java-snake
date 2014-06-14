@@ -30,7 +30,7 @@ public class Game {
 		this.directionStrategy = directionStrategy;
 		setSnake(level.getInitialSnake());
 		directionStrategy.setDirection(head.getDirection());
-		putLengthBlock();
+		putLengthBlock(head);
 	}
 
 	private Block[][] createBlockMatrix() {
@@ -49,7 +49,7 @@ public class Game {
 		return (!level.isReachable(coordinate)) || (field.get(coordinate) instanceof WallBlock);
 	}
 
-	private void putLengthBlock() {
+	private void putLengthBlock(SnakeBlock head) {
 		for (int i = 0; i < MAX_RANDOM_TRIES; ++i) {
 			Coordinate randomCoordinate = level.findRandomCoordinate();
 			if (!isUnreachable(randomCoordinate) && !head.collidesWith(randomCoordinate)) {
@@ -85,7 +85,7 @@ public class Game {
 		SnakeBlock moved = direction.move();
 		if (isLengthIncreaser(moved.coordinate)) {
 			moved = direction.enlarge();
-			putLengthBlock();
+			putLengthBlock(moved);
 		}
 		if (moved.collidesWithTail() || isUnreachable(moved.coordinate)) {
 			return new GameStatus(State.ENDED, createBlockMatrix(), moved);
