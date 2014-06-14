@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Snake
+Bundle-SymbolicName: ch.nanz.snake
+Bundle-Version: 1.0.0.qualifier
+Export-Package: ch.nanz.snake.core,
+ ch.nanz.snake.model
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
