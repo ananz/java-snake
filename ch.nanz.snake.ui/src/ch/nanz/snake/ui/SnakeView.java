@@ -25,12 +25,12 @@ public class SnakeView extends ViewPart {
 
 	public final static String VIEW_ID = "ch.nanz.snake.ui.view";
 
-	private static final int MINIMAL_SLEEP_TIME = 80;
+	private static final int MINIMAL_SLEEP_TIME = 70;
 	private static final int INITIAL_SLEEP_TIME = 200;
 	private final static int BLOCK_SIZE = 25;
 
 	private Game game;
-	private volatile GameStatus status = null;
+	private GameStatus status = null;
 	private Composite content;
 
 	@Override
@@ -43,7 +43,9 @@ public class SnakeView extends ViewPart {
 			public void keyPressed(KeyEvent e) {
 				if (game == null) {
 					start();
-				} else if (e.keyCode == SWT.ARROW_UP) {
+				}
+
+				if (e.keyCode == SWT.ARROW_UP) {
 					game.setDirection(Direction.UP);
 				} else if (e.keyCode == SWT.ARROW_DOWN) {
 					game.setDirection(Direction.DOWN);
@@ -87,35 +89,45 @@ public class SnakeView extends ViewPart {
 					}
 				}
 				if (status.state == State.RUNNING) {
+					e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 					for (SnakeBlock snake : status.snakeHead) {
-						e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 						e.gc.fillRectangle(snake.coordinate.x * xSize, snake.coordinate.y * ySize, xSize, ySize);
 					}
+					e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
+					e.gc.fillRectangle(status.snakeHead.coordinate.x * xSize, status.snakeHead.coordinate.y * ySize, xSize, ySize);
 				}
 			}
 		});
-
 	}
 
 	private void start() {
 		Rectangle bounds = content.getBounds();
 		game = new Game(new RectangularLevel(bounds.width / BLOCK_SIZE, bounds.height / BLOCK_SIZE));
 		new Thread(new Runnable() {
+
+			private final Runnable redrawJob = new Runnable() {
+				@Override
+				public void run() {
+					if (!content.isDisposed()) {
+						content.redraw();
+					}
+				}
+			};
+
 			@Override
 			public void run() {
 				try {
 					int wait = INITIAL_SLEEP_TIME;
 					do {
+						if (content.isDisposed()) {
+							break;
+						}
 						status = game.tick();
-						Display.getDefault().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								if (!content.isDisposed()) {
-									content.redraw();
-								}
-							}
-						});
-						Thread.sleep(Math.max(MINIMAL_SLEEP_TIME, Math.random() < 0.5 ? wait-- : wait));
+						Display.getDefault().asyncExec(redrawJob);
+						Thread.sleep(wait);
+						if (wait > MINIMAL_SLEEP_TIME && Math.random() < 0.5) {
+							wait -= 1;
+						}
 					} while (status.state != State.ENDED);
 				} catch (InterruptedException e) {
 				}
