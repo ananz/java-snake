@@ -53,6 +53,8 @@ public class SnakeView extends ViewPart {
 					game.setDirection(Direction.LEFT);
 				} else if (e.keyCode == SWT.ARROW_RIGHT) {
 					game.setDirection(Direction.RIGHT);
+				} else if (e.keyCode == ' ') {
+					getSite().getWorkbenchWindow().getActivePage().hideView(SnakeView.this);
 				}
 			}
 		});
