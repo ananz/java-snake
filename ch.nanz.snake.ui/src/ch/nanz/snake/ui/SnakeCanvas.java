@@ -33,6 +33,9 @@ public class SnakeCanvas extends Canvas {
 				int xSize = bounds.width / gameWidth;
 				int ySize = bounds.height / gameHeight;
 
+				int shiftX = (bounds.width - gameWidth * xSize) / 2;
+				int shiftY = (bounds.height - gameHeight * ySize) / 2;
+
 				for (int x = 0; x < gameWidth; ++x) {
 					for (int y = 0; y < gameHeight; ++y) {
 						Block block = status.matrix[x][y];
@@ -46,17 +49,17 @@ public class SnakeCanvas extends Canvas {
 							e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
 						}
 						if (block != null) {
-							e.gc.fillRectangle(x * xSize, y * ySize, xSize, ySize);
+							e.gc.fillRectangle(x * xSize + shiftX, y * ySize + shiftY, xSize, ySize);
 						}
 					}
 				}
 				if (status.state == State.RUNNING) {
 					e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 					for (SnakeBlock snake : status.snakeHead) {
-						e.gc.fillRectangle(snake.coordinate.x * xSize, snake.coordinate.y * ySize, xSize, ySize);
+						e.gc.fillRectangle(snake.coordinate.x * xSize + shiftX, snake.coordinate.y * ySize + shiftY, xSize, ySize);
 					}
 					e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
-					e.gc.fillRectangle(status.snakeHead.coordinate.x * xSize, status.snakeHead.coordinate.y * ySize, xSize, ySize);
+					e.gc.fillRectangle(status.snakeHead.coordinate.x * xSize + shiftX, status.snakeHead.coordinate.y * ySize + shiftY, xSize, ySize);
 				}
 			}
 		}
