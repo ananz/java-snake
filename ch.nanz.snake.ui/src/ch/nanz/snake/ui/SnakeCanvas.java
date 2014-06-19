@@ -8,8 +8,8 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import ch.nanz.snake.core.GameStatus;
-import ch.nanz.snake.core.GameStatus.State;
+import ch.nanz.snake.core.GameUpdate;
+import ch.nanz.snake.core.GameUpdate.State;
 import ch.nanz.snake.model.Block;
 import ch.nanz.snake.model.LengthBlock;
 import ch.nanz.snake.model.SnakeBlock;
@@ -74,7 +74,7 @@ public class SnakeCanvas extends Canvas {
 		}
 	};
 
-	private GameStatus status = null;
+	private GameUpdate status = null;
 
 	public SnakeCanvas(Composite parent) {
 		super(parent, SWT.NONE);
@@ -82,7 +82,7 @@ public class SnakeCanvas extends Canvas {
 		addPaintListener(paintListener);
 	}
 
-	public void showGameStatus(GameStatus status) {
+	public void showGameStatus(GameUpdate status) {
 		synchronized (lock) {
 			this.status = status;
 		}

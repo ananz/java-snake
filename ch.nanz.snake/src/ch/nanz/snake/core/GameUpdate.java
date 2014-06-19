@@ -4,7 +4,7 @@ import ch.nanz.snake.model.Block;
 import ch.nanz.snake.model.SnakeBlock;
 
 
-public class GameStatus {
+public class GameUpdate {
 
 	public static enum State {
 		ENDED, RUNNING;
@@ -14,7 +14,7 @@ public class GameStatus {
 	public final SnakeBlock snakeHead;
 	public final State state;
 
-	public GameStatus(State state, Block[][] matrix, SnakeBlock snakeHead) {
+	public GameUpdate(State state, Block[][] matrix, SnakeBlock snakeHead) {
 		this.state = state;
 		this.matrix = matrix;
 		this.snakeHead = snakeHead;

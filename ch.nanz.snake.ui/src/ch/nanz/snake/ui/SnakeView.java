@@ -9,8 +9,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.nanz.snake.core.Game;
-import ch.nanz.snake.core.GameStatus;
-import ch.nanz.snake.core.GameStatus.State;
+import ch.nanz.snake.core.GameUpdate;
+import ch.nanz.snake.core.GameUpdate.State;
 import ch.nanz.snake.core.RectangularLevel;
 import ch.nanz.snake.model.Direction;
 
@@ -62,7 +62,7 @@ public class SnakeView extends ViewPart {
 			public void run() {
 				try {
 					int wait = INITIAL_SLEEP_TIME;
-					GameStatus status = null;
+					GameUpdate status = null;
 					do {
 						if (content.isDisposed()) {
 							break;

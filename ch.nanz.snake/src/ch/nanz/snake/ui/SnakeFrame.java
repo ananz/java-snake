@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import ch.nanz.snake.core.Game;
-import ch.nanz.snake.core.GameStatus;
-import ch.nanz.snake.core.GameStatus.State;
+import ch.nanz.snake.core.GameUpdate;
+import ch.nanz.snake.core.GameUpdate.State;
 import ch.nanz.snake.core.RectangularLevel;
 import ch.nanz.snake.model.Direction;
 import ch.nanz.snake.model.LengthBlock;
@@ -83,7 +83,7 @@ public class SnakeFrame extends JFrame {
 			public void run() {
 				try {
 					int wait = 200;
-					GameStatus status = null;
+					GameUpdate status = null;
 					do {
 						fieldUpdated(status = game.tick());
 						Thread.sleep(Math.max(80, Math.random() < 0.5 ? wait-- : wait));
@@ -95,7 +95,7 @@ public class SnakeFrame extends JFrame {
 		}).start();
 	}
 
-	private void fieldUpdated(GameStatus status) {
+	private void fieldUpdated(GameUpdate status) {
 		for (int x = 0; x < status.matrix.length; ++x) {
 			for (int y = 0; y < status.matrix[0].length; ++y) {
 				JLabel label = labels[x][y];
