@@ -8,58 +8,54 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
+import ch.nanz.snake.core.GameFacade.GameUpdateListener;
+import ch.nanz.snake.core.GameFacade.State;
 import ch.nanz.snake.core.GameUpdate;
-import ch.nanz.snake.core.GameUpdate.State;
 import ch.nanz.snake.model.Block;
 import ch.nanz.snake.model.LengthBlock;
 import ch.nanz.snake.model.SnakeBlock;
 import ch.nanz.snake.model.WallBlock;
 
-public class SnakeCanvas extends Canvas {
-
-	private final Object lock = new Object();
+public class SnakeCanvas extends Canvas implements GameUpdateListener {
 
 	private final PaintListener paintListener = new PaintListener() {
 		@Override
 		public void paintControl(PaintEvent e) {
-			synchronized (lock) {
-				if (status == null) {
-					return;
-				}
-				int gameWidth = status.matrix.length;
-				int gameHeight = status.matrix[0].length;
+			if (update == null) {
+				return;
+			}
+			int gameWidth = update.matrix.length;
+			int gameHeight = update.matrix[0].length;
 
-				Rectangle bounds = getBounds();
-				int xSize = bounds.width / gameWidth;
-				int ySize = bounds.height / gameHeight;
+			Rectangle bounds = getBounds();
+			int xSize = bounds.width / gameWidth;
+			int ySize = bounds.height / gameHeight;
 
-				int shiftX = (bounds.width - gameWidth * xSize) / 2;
-				int shiftY = (bounds.height - gameHeight * ySize) / 2;
+			int shiftX = (bounds.width - gameWidth * xSize) / 2;
+			int shiftY = (bounds.height - gameHeight * ySize) / 2;
 
-				for (int x = 0; x < gameWidth; ++x) {
-					for (int y = 0; y < gameHeight; ++y) {
-						Block block = status.matrix[x][y];
-						if (block instanceof SnakeBlock) {
-							e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-						} else if (block instanceof LengthBlock) {
-							e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-						} else if (block instanceof WallBlock) {
-							e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			for (int x = 0; x < gameWidth; ++x) {
+				for (int y = 0; y < gameHeight; ++y) {
+					Block block = update.matrix[x][y];
+					if (block instanceof SnakeBlock) {
+						if (update.alive) {
+							e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+							if (block == update.snakeHead) {
+								e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
+							}
 						} else {
-							e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+							e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
 						}
-						if (block != null) {
-							e.gc.fillRectangle(x * xSize + shiftX, y * ySize + shiftY, xSize, ySize);
-						}
+					} else if (block instanceof LengthBlock) {
+						e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+					} else if (block instanceof WallBlock) {
+						e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+					} else {
+						e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
 					}
-				}
-				if (status.state == State.RUNNING) {
-					e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-					for (SnakeBlock snake : status.snakeHead) {
-						e.gc.fillRectangle(snake.coordinate.x * xSize + shiftX, snake.coordinate.y * ySize + shiftY, xSize, ySize);
+					if (block != null) {
+						e.gc.fillRectangle(x * xSize + shiftX, y * ySize + shiftY, xSize, ySize);
 					}
-					e.gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
-					e.gc.fillRectangle(status.snakeHead.coordinate.x * xSize + shiftX, status.snakeHead.coordinate.y * ySize + shiftY, xSize, ySize);
 				}
 			}
 		}
@@ -74,27 +70,17 @@ public class SnakeCanvas extends Canvas {
 		}
 	};
 
-	private GameUpdate status = null;
+	private GameUpdate update = null;
 
-	public SnakeCanvas(Composite parent) {
-		super(parent, SWT.NONE);
-
+	public SnakeCanvas(Composite parent, int style) {
+		super(parent, style);
 		addPaintListener(paintListener);
 	}
 
-	public void showGameStatus(GameUpdate status) {
-		synchronized (lock) {
-			this.status = status;
-		}
-		redraw();
-	}
-
-	@Override
-	public void redraw() {
-		if (Display.getCurrent() != null) {
-			redrawJob.run();
-		} else if (!isDisposed()) {
-			Display.getDefault().asyncExec(redrawJob);
+	public void update(GameUpdate update, State state) {
+		if (!isDisposed()) {
+			this.update = update;
+			Display.getDefault().syncExec(redrawJob);
 		}
 	}
 }

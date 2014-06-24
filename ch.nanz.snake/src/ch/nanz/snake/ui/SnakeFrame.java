@@ -9,16 +9,17 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import ch.nanz.snake.core.Game;
+import ch.nanz.snake.core.GameFacade;
+import ch.nanz.snake.core.GameFacade.GameUpdateListener;
+import ch.nanz.snake.core.GameFacade.State;
 import ch.nanz.snake.core.GameUpdate;
-import ch.nanz.snake.core.GameUpdate.State;
 import ch.nanz.snake.core.RectangularLevel;
 import ch.nanz.snake.model.Direction;
 import ch.nanz.snake.model.LengthBlock;
 import ch.nanz.snake.model.SnakeBlock;
 import ch.nanz.snake.model.WallBlock;
 
-public class SnakeFrame extends JFrame {
+public class SnakeFrame extends JFrame implements GameUpdateListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,14 +36,10 @@ public class SnakeFrame extends JFrame {
 	}
 
 	private final JLabel[][] labels;
-	private final int width, height;
 
-	private Game game = null;
+	private final GameFacade game = new GameFacade(this);
 
-	public SnakeFrame(int width, int height) {
-		this.width = width;
-		this.height = height;
-
+	public SnakeFrame(final int width, final int height) {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(20 * width, 20 * height);
 		setLayout(new GridLayout(height, width));
@@ -60,9 +57,11 @@ public class SnakeFrame extends JFrame {
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (game == null) {
-					start();
-				} else if (e.getKeyCode() == KeyEvent.VK_UP) {
+				if (game.getState() != State.RUNNING) {
+					game.start(new RectangularLevel(width, height));
+				}
+
+				if (e.getKeyCode() == KeyEvent.VK_UP) {
 					game.setDirection(Direction.UP);
 				} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 					game.setDirection(Direction.DOWN);
@@ -73,50 +72,25 @@ public class SnakeFrame extends JFrame {
 				}
 			}
 		});
-		// start();
 	}
 
-	private void start() {
-		game = new Game(new RectangularLevel(width, height));
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					int wait = 200;
-					GameUpdate status = null;
-					do {
-						fieldUpdated(status = game.tick());
-						Thread.sleep(Math.max(80, Math.random() < 0.5 ? wait-- : wait));
-					} while (status.state != State.ENDED);
-				} catch (InterruptedException e) {
-				}
-				game = null;
-			}
-		}).start();
-	}
-
-	private void fieldUpdated(GameUpdate status) {
-		for (int x = 0; x < status.matrix.length; ++x) {
-			for (int y = 0; y < status.matrix[0].length; ++y) {
+	public void update(GameUpdate update, State state) {
+		for (int x = 0; x < update.matrix.length; ++x) {
+			for (int y = 0; y < update.matrix[0].length; ++y) {
 				JLabel label = labels[x][y];
-				label.setForeground(Color.BLACK);
-				if (status.matrix[x][y] instanceof SnakeBlock) {
+				if (update.matrix[x][y] instanceof SnakeBlock) {
+					label.setForeground(update.alive ? Color.GREEN : Color.BLACK);
 					label.setText("O");
-				} else if (status.matrix[x][y] instanceof LengthBlock) {
+				} else if (update.matrix[x][y] instanceof LengthBlock) {
 					label.setForeground(Color.MAGENTA);
 					label.setText("o");
-				} else if (status.matrix[x][y] instanceof WallBlock) {
+				} else if (update.matrix[x][y] instanceof WallBlock) {
 					label.setForeground(Color.RED);
 					label.setText("X");
 				} else {
+					label.setForeground(Color.WHITE);
 					label.setText(".");
 				}
-			}
-		}
-		if (status.state == State.RUNNING) {
-			for (SnakeBlock snake : status.snakeHead) {
-				JLabel label = labels[snake.coordinate.x][snake.coordinate.y];
-				label.setForeground(Color.GREEN);
 			}
 		}
 	}

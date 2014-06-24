@@ -1,6 +1,5 @@
 package ch.nanz.snake.core;
 
-import ch.nanz.snake.core.GameUpdate.State;
 import ch.nanz.snake.model.Block;
 import ch.nanz.snake.model.Coordinate;
 import ch.nanz.snake.model.Direction;
@@ -88,9 +87,9 @@ public class Game {
 			putLengthBlock(moved);
 		}
 		if (moved.collidesWithTail() || isUnreachable(moved.coordinate)) {
-			return new GameUpdate(State.ENDED, createBlockMatrix(), moved);
+			return new GameUpdate(false, createBlockMatrix(), moved);
 		}
 		setSnake(moved);
-		return new GameUpdate(State.RUNNING, createBlockMatrix(), moved);
+		return new GameUpdate(true, createBlockMatrix(), moved);
 	}
 }
