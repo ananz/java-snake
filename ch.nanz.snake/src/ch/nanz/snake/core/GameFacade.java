@@ -34,6 +34,7 @@ public class GameFacade {
 					}
 				} while (status.alive);
 			} catch (InterruptedException e) {
+				return;
 			}
 			state = State.STOPPED;
 		}
@@ -65,27 +66,29 @@ public class GameFacade {
 	}
 
 	public void setDirection(Direction direction) {
-		if (game != null) {
+		if (game != null && state == State.RUNNING) {
 			game.setDirection(direction);
 		}
 	}
 
 	public void start(Level level) {
-		start(new Game(level), new Thread(runner = new Runner()));
+		start(new Game(level), new Runner());
 	}
 
 	public void resume() {
 		if (game != null && runner != null) {
 			pause();
-			start(game, new Thread(runner));
+			start(game, this.runner);
 		}
 	}
 
-	private void start(Game game, Thread thread) {
+	private void start(Game game, Runner runner) {
 		stop();
 		this.game = game;
-		this.thread = thread;
-		this.thread.start();
+		this.thread = new Thread(this.runner = runner);
+		thread.setName("Snake Thread");
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 	public void stop() {

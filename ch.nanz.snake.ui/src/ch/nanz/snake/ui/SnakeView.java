@@ -34,6 +34,13 @@ public class SnakeView extends ViewPart {
 					// BOSS KEY ...
 					getSite().getPage().hideView(SnakeView.this);
 					return;
+				} else if (e.keyCode == '.') {
+					if (game.getState() == GameFacade.State.RUNNING) {
+						game.pause();
+					} else if (game.getState() == GameFacade.State.PAUSED) {
+						game.resume();
+					}
+					return;
 				}
 
 				if (GameFacade.State.STOPPED == game.getState()) {
@@ -41,17 +48,16 @@ public class SnakeView extends ViewPart {
 					game.start(new RectangularLevel(bounds.width / BLOCK_SIZE, bounds.height / BLOCK_SIZE));
 				}
 
-				if (game.getState() == GameFacade.State.RUNNING) {
-					if (e.keyCode == SWT.ARROW_UP) {
-						game.setDirection(Direction.UP);
-					} else if (e.keyCode == SWT.ARROW_DOWN) {
-						game.setDirection(Direction.DOWN);
-					} else if (e.keyCode == SWT.ARROW_LEFT) {
-						game.setDirection(Direction.LEFT);
-					} else if (e.keyCode == SWT.ARROW_RIGHT) {
-						game.setDirection(Direction.RIGHT);
-					}
+				if (e.keyCode == SWT.ARROW_UP) {
+					game.setDirection(Direction.UP);
+				} else if (e.keyCode == SWT.ARROW_DOWN) {
+					game.setDirection(Direction.DOWN);
+				} else if (e.keyCode == SWT.ARROW_LEFT) {
+					game.setDirection(Direction.LEFT);
+				} else if (e.keyCode == SWT.ARROW_RIGHT) {
+					game.setDirection(Direction.RIGHT);
 				}
+
 			}
 		});
 	}
