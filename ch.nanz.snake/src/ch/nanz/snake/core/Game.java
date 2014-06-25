@@ -80,7 +80,8 @@ public class Game {
 
 	public synchronized GameUpdate tick() {
 		level.tick();
-		SnakeBlock direction = head.changeDirection(directionStrategy.getDirection());
+		Direction newDirection = directionStrategy.getDirection();
+		SnakeBlock direction = newDirection.opposite() != head.getDirection() ? head.changeDirection(newDirection) : head;
 		SnakeBlock moved = direction.move();
 		if (isLengthIncreaser(moved.coordinate)) {
 			moved = direction.enlarge();

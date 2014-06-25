@@ -6,7 +6,7 @@ import ch.nanz.snake.model.Level;
 public class GameFacade {
 
 	public static interface GameUpdateListener {
-		void update(GameUpdate update, State state);
+		void update(GameUpdate update);
 	}
 
 	public static enum State {
@@ -23,7 +23,7 @@ public class GameFacade {
 				GameUpdate status = null;
 				do {
 					long start = System.currentTimeMillis();
-					listener.update(status = game.tick(), getState());
+					listener.update(status = game.tick());
 					long end = System.currentTimeMillis();
 					int effectiveSleepTime = targetedSleepTime - (int) (end - start);
 					if (effectiveSleepTime > 0) {

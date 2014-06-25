@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import ch.nanz.snake.core.GameFacade.GameUpdateListener;
-import ch.nanz.snake.core.GameFacade.State;
 import ch.nanz.snake.core.GameUpdate;
 import ch.nanz.snake.model.Block;
 import ch.nanz.snake.model.LengthBlock;
@@ -77,7 +76,7 @@ public class SnakeCanvas extends Canvas implements GameUpdateListener {
 		addPaintListener(paintListener);
 	}
 
-	public void update(GameUpdate update, State state) {
+	public void update(GameUpdate update) {
 		if (!isDisposed()) {
 			this.update = update;
 			Display.getDefault().syncExec(redrawJob);

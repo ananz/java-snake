@@ -74,7 +74,7 @@ public class SnakeFrame extends JFrame implements GameUpdateListener {
 		});
 	}
 
-	public void update(GameUpdate update, State state) {
+	public void update(GameUpdate update) {
 		for (int x = 0; x < update.matrix.length; ++x) {
 			for (int y = 0; y < update.matrix[0].length; ++y) {
 				JLabel label = labels[x][y];
